@@ -7,12 +7,111 @@ MainWindow::MainWindow(QWidget *parent)
     setupUi(this);
     addPerson* person = new addPerson();
     person->show();
+
+
+    //ниже наша часть конструктора
+    count = 0;
+    this->treeWidget->setColumnCount(1);
+    QStringList headers;
+    headers << tr("Объекты");
+    this->treeWidget->setHeaderLabels(headers);
+    currentItem = NULL;
+    currentColumn = 0;
+
+    connect(this->pushButton_2, SIGNAL(clicked()), this, SLOT(on_addPerson()));
+    connect(this->pushButton_3, SIGNAL(clicked()), this, SLOT(on_deletePerson()));
 }
 
 MainWindow::~MainWindow()
 {
 }
+int MainWindow::treeCount(QTreeWidget *tree, QTreeWidgetItem *parent = 0) {
+/*
+ не учтёт свёрнутые ветви; потому что правильно было бы делать через модель
+*/
+ tree->expandAll(); //а это "костыль"
+ int count = 0;
+ if (parent == 0) {
+  int topCount = tree->topLevelItemCount();
+  for (int i = 0; i < topCount; i++) {
+   QTreeWidgetItem *item = tree->topLevelItem(i);
+   if (item->isExpanded()) {
+    count += treeCount(tree, item);
+   }
+  }
+  count += topCount;
+ }
+ else {
+  int childCount = parent->childCount();
+  for (int i = 0; i < childCount; i++) {
+   QTreeWidgetItem *item = parent->child(i);
+   if (item->isExpanded()) {
+    count += treeCount(tree, item);
+   }
+  }
+  count += childCount;
+ }
+ return count;
+}
 
+void MainWindow::DeleteItem (QTreeWidgetItem *currentItem) {
+ QTreeWidgetItem *parent = currentItem->parent();
+ int index;
+ if (parent) {
+  index = parent->indexOfChild(this->treeWidget->currentItem());
+  delete parent->takeChild(index);
+ }
+ else {
+  index = this->treeWidget->indexOfTopLevelItem(this->treeWidget->currentItem());
+  delete this->treeWidget->takeTopLevelItem(index);
+ }
+}
+
+void MainWindow::InsertItem (QTreeWidgetItem *parent, QString text) {
+ if (parent->isExpanded()==false) parent->setExpanded(true);
+ QTreeWidgetItem *newItem = new QTreeWidgetItem(parent, this->treeWidget->currentItem());
+ newItem->setText (currentColumn, text);
+ newItem->setExpanded(true);
+}
+
+
+void MainWindow::on_addPerson() { //кнопка Добавить
+ if (currentItem) {
+  QString word = currentItem->text(currentColumn);
+  InsertItem  (currentItem, word + " " + QString("%1").arg(++count));
+ }
+ else {
+  QTreeWidgetItem *newItem = new QTreeWidgetItem(this->treeWidget, this->treeWidget->currentItem());
+   //указываем 2-м параметром текущий элемент как предшествующий
+  newItem->setText (currentColumn, "" + QString("%1").arg(++count));
+  newItem->setExpanded(true);
+ }
+ currentItem = NULL;
+ showAll();
+}
+
+void MainWindow::on_deletePerson() { //кнопка Удалить
+ if (currentItem) {
+  DeleteItem (currentItem);
+  currentItem = NULL;
+ }
+ showAll();
+}
+
+void MainWindow::showAll(void) {
+ int cnt = treeCount (this->treeWidget);
+ QString str(tr("Всего: ")+QString("%1").arg(cnt));
+ setWindowTitle(str);
+}
+
+void MainWindow::on_treeWidget_itemClicked(QTreeWidgetItem *item, int column) {
+ currentItem = item;
+ currentColumn = column;
+}
+
+
+
+//-----------------------------------------------------------------
 void MainWindow::setupUi(QMainWindow *MainWindow)
    {
        if (MainWindow->objectName().isEmpty())

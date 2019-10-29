@@ -43,5 +43,24 @@ public:
 private:
     void retranslateUi(QMainWindow *MainWindow);
     void setupUi(QMainWindow *MainWindow);
+
+private slots:
+//    void addFamily();
+//    void addBrother();
+//    void addSon();
+
+private slots:
+    void on_addPerson();
+    void on_deletePerson();
+    void on_treeWidget_itemClicked(QTreeWidgetItem *item, int column);
+
+private:
+    int treeCount(QTreeWidget *, QTreeWidgetItem *); //подсчёт количества элементов в QTreeWidget
+    void DeleteItem (QTreeWidgetItem *currentItem); //удаление элемента из QTreeWidget
+    void InsertItem (QTreeWidgetItem *, QString); //добавление элемента в QTreeWidget
+    void showAll(void); //вывод информации о QTreeWidget
+    int count; //переменная для хранения номера очередного узла
+    QTreeWidgetItem *currentItem; //текущий элемент, запоминается при клике в QTreeWidget
+    int currentColumn; //номер столбца, на самом деле будет = 0, т.к. у нас 1 столбец
 };
 #endif // MAINWINDOW_H
