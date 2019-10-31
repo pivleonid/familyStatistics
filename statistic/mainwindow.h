@@ -1,4 +1,4 @@
-#ifndef MAINWINDOW_H
+﻿#ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
 #include <QMainWindow>
@@ -45,22 +45,21 @@ private:
     void setupUi(QMainWindow *MainWindow);
 
 private slots:
-//    void addFamily();
-//    void addBrother();
-//    void addSon();
-
-private slots:
     void on_addPerson();
     void on_deletePerson();
-    void on_treeWidget_itemClicked(QTreeWidgetItem *item, int column);
+    void on_doubleClicked(QTreeWidgetItem * item, int column);
+    void on_Clicked(QTreeWidgetItem * item, int column);
+    void acceptPerson(QString str);
+
 
 private:
-    int treeCount(QTreeWidget *, QTreeWidgetItem *); //подсчёт количества элементов в QTreeWidget
-    void DeleteItem (QTreeWidgetItem *currentItem); //удаление элемента из QTreeWidget
-    void InsertItem (QTreeWidgetItem *, QString); //добавление элемента в QTreeWidget
+    int  treeCount(QTreeWidget *, QTreeWidgetItem *); //подсчёт количества элементов в QTreeWidget
+    void deleteItem (QTreeWidgetItem *currentItem); //удаление элемента из QTreeWidget
+    void insertItem (QTreeWidgetItem *, QString); //добавление элемента в QTreeWidget
     void showAll(void); //вывод информации о QTreeWidget
-    int count; //переменная для хранения номера очередного узла
-    QTreeWidgetItem *currentItem; //текущий элемент, запоминается при клике в QTreeWidget
-    int currentColumn; //номер столбца, на самом деле будет = 0, т.к. у нас 1 столбец
+
+    int              m_count;         //переменная для хранения номера очередного узла
+    QTreeWidgetItem* m_currentItem;   //текущий элемент, запоминается при клике в QTreeWidget
+    int              m_currentColumn; //номер столбца, на самом деле будет = 0, т.к. у нас 1 столбец
 };
 #endif // MAINWINDOW_H

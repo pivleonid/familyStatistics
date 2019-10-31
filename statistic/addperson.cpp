@@ -1,11 +1,32 @@
-#include "addperson.h"
+﻿#include "addperson.h"
 
-addPerson::addPerson(QWidget *parent) : QWidget(parent)
+#define SPR "(;)"
+
+addPerson::addPerson(QDialog *parent) : QDialog(parent)
 {
     setupUi(this);
+    connect(pushButton_Add, SIGNAL(clicked()), this, SLOT(slt_add()));
+    connect(pushButton_cancel, SIGNAL(clicked()), this, SLOT(slt_cancel()));
+    pushButton_Add->setDefault(true);// Enter по умолчанию
+
+}
+void addPerson::slt_add()
+{
+    QString str = lineEdit_name->text() + SPR + lineEdit_patronymic->text()
+            + SPR +  lineEdit_nameFather->text() + SPR +  lineEdit_born->text()
+            + SPR +  lineEdit_die->text() + SPR +  plainTextEdit->toPlainText();
+    emit s_personAdd(str);
+    //this->close();
+    this->accept();
+
+}
+void addPerson::slt_cancel()
+{
+    emit s_personCancel();
+    this->reject();
 }
 
-
+//-----------------------------------------------------
 void addPerson::setupUi(QWidget *Form)
     {
         if (Form->objectName().isEmpty())

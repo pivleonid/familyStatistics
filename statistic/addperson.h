@@ -1,4 +1,4 @@
-#ifndef ADDPERSON_H
+﻿#ifndef ADDPERSON_H
 #define ADDPERSON_H
 
 #include <QObject>
@@ -12,7 +12,9 @@
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QWidget>
 
-class addPerson : public QWidget
+#include <QDialog>
+
+class addPerson : public QDialog
 {
     Q_OBJECT
 public:
@@ -32,11 +34,14 @@ public:
     QLineEdit *lineEdit_born;
     QLabel *label_5;
     QLineEdit *lineEdit_die;
-    explicit addPerson(QWidget *parent = nullptr);
+    explicit addPerson(QDialog *parent = nullptr);
 
 signals:
-
+    void s_personAdd(QString);
+    void s_personCancel();
 public slots:
+    void slt_add();
+    void slt_cancel();
 
 private:
     void setupUi(QWidget *Form);
