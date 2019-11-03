@@ -24,15 +24,131 @@ MainWindow::MainWindow(QWidget *parent)
     connect(treeWidget, &QTreeWidget::itemClicked, this, &MainWindow::on_Clicked);
     connect(treeWidget, &QTreeWidget::itemDoubleClicked, this, &MainWindow::on_doubleClicked);
 
+    connect(pushButton, SIGNAL(clicked()), this, SLOT(on_savePersonStack()));
+
 
 }
+void MainWindow::savePersonStack(personInfo& person_father, QTreeWidgetItem* parent)
+{
+    //для первой колонки
+    if (parent == 0)
+    {
+        int topCount = treeWidget->topLevelItemCount();
+        for (int i = 0; i < topCount; i++)
+        {
+            QTreeWidgetItem *item = treeWidget->topLevelItem(i);
+            if( item->childCount() > 0)
+            {
+                personInfo father;
+                QString allString = item->text(m_currentColumn);
+                QStringList splitStr = allString.split("(;)");
+                QByteArray b_array;
+                b_array.append(allString);
+                father.id = QCryptographicHash::hash(b_array, QCryptographicHash::Md5);
+                father.id_father = 0;
+                father.name = splitStr[0];
+                father.patronymic = splitStr[1];
+                father.nameFather = splitStr[2];
+                father.born = splitStr[3];
+                father.die = splitStr[4];
+                father.info = splitStr[5];
+                m_familly << father;
+                savePersonStack(father, item);
+            }
+            else
+            {
+                personInfo father;
+                QString allString = item->text(m_currentColumn);
+                QStringList splitStr = allString.split("(;)");
+                QByteArray b_array;
+                b_array.append(allString);
+                father.id = QCryptographicHash::hash(b_array, QCryptographicHash::Md5);
+                father.id_father = 0;
+                father.name = splitStr[0];
+                father.patronymic = splitStr[1];
+                father.nameFather = splitStr[2];
+                father.born = splitStr[3];
+                father.die = splitStr[4];
+                father.info = splitStr[5];
+                m_familly << father;
+            }
+        }
+    }
+    //для последующих
+    else {
+        int childCount = parent->childCount();
+        for (int i = 0; i < childCount; i++)
+        {
+            QTreeWidgetItem *item = parent->child(i);
+            if( item->childCount() > 0)//если есть вложенные данные
+            {
+                personInfo son_n;
+                QString allString = item->text(m_currentColumn);
+                QStringList splitStr = allString.split("(;)");
+                QByteArray b_array;
+                b_array.append(allString);
+                son_n.id = QCryptographicHash::hash(b_array, QCryptographicHash::Md5);
+                son_n.id_father = person_father.id;
+                son_n.name = splitStr[0];
+                son_n.patronymic = splitStr[1];
+                son_n.nameFather = splitStr[2];
+                son_n.born = splitStr[3];
+                son_n.die = splitStr[4];
+                son_n.info = splitStr[5];
+                savePersonStack(son_n, item);
+            }
+            else
+            {
+                personInfo son_n;
+                QString allString = item->text(m_currentColumn);
+                QStringList splitStr = allString.split("(;)");
+                QByteArray b_array;
+                b_array.append(allString);
+                son_n.id = QCryptographicHash::hash(b_array, QCryptographicHash::Md5);
+                son_n.id_father = person_father.id;
+                son_n.name = splitStr[0];
+                son_n.patronymic = splitStr[1];
+                son_n.nameFather = splitStr[2];
+                son_n.born = splitStr[3];
+                son_n.die = splitStr[4];
+                son_n.info = splitStr[5];
+                m_familly << son_n;
+            }
+        }
+    }
+}
+#include <QDebug>
+void MainWindow::on_savePersonStack()
+{
+    /*
+    не учтёт свёрнутые ветви; потому что правильно было бы делать через модель
+   */
+       treeWidget->expandAll(); //а это "костыль"
+       personInfo person_father;
+       savePersonStack( person_father);
+       int a;
+       a++;
+       foreach (auto var, m_familly) {
+           qDebug() << "id = "<< var.id << "; id father = " << var.id_father;
+       }
+       qDebug() << "//---------------------------------//";
+       m_familly_list << m_familly;
+       m_familly.clear();
+
+       //удаление из виджета
+       treeWidget->clear();
+       m_count = 0;
+       m_currentItem = NULL;
+
+
+}
+
 
 void MainWindow::on_Clicked(QTreeWidgetItem * item, int column)
 {
     m_currentItem = item;
     m_currentColumn = column;
 }
-#include <QtDebug>
 void MainWindow::on_doubleClicked(QTreeWidgetItem * item, int column)
 {
     addPerson person;
@@ -62,14 +178,16 @@ MainWindow::~MainWindow()
 {
 }
 int MainWindow::treeCount(QTreeWidget *tree, QTreeWidgetItem *parent = 0) {
-    /*
+ /*
  не учтёт свёрнутые ветви; потому что правильно было бы делать через модель
 */
     tree->expandAll(); //а это "костыль"
     int count = 0;
-    if (parent == 0) {
+    if (parent == 0)
+    {
         int topCount = tree->topLevelItemCount();
-        for (int i = 0; i < topCount; i++) {
+        for (int i = 0; i < topCount; i++)
+        {
             QTreeWidgetItem *item = tree->topLevelItem(i);
             if (item->isExpanded()) {
                 count += treeCount(tree, item);
@@ -79,9 +197,11 @@ int MainWindow::treeCount(QTreeWidget *tree, QTreeWidgetItem *parent = 0) {
     }
     else {
         int childCount = parent->childCount();
-        for (int i = 0; i < childCount; i++) {
+        for (int i = 0; i < childCount; i++)
+        {
             QTreeWidgetItem *item = parent->child(i);
-            if (item->isExpanded()) {
+            if (item->isExpanded())
+            {
                 count += treeCount(tree, item);
             }
         }
@@ -123,7 +243,7 @@ void MainWindow::on_addPerson() { //кнопка Добавить
         newItem->setText (m_currentColumn, "" + QString("%1").arg(++m_count));
         newItem->setExpanded(true);
     }
-    m_currentItem = NULL;
+    //m_currentItem = NULL;
     showAll();
 }
 
@@ -133,6 +253,7 @@ void MainWindow::on_deletePerson() { //кнопка Удалить
         m_currentItem = NULL;
     }
     showAll();
+
 }
 
 void MainWindow::showAll(void) {

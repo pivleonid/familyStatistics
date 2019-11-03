@@ -9,6 +9,8 @@ addPerson::addPerson(QDialog *parent) : QDialog(parent)
     connect(pushButton_cancel, SIGNAL(clicked()), this, SLOT(slt_cancel()));
     pushButton_Add->setDefault(true);// Enter по умолчанию
 
+    this->setWindowTitle("Введите параметры");
+
 }
 void addPerson::slt_add()
 {

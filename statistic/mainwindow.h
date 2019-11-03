@@ -16,9 +16,27 @@
 #include <QtWidgets/QTreeWidget>
 #include <QtWidgets/QWidget>
 
+#include <QCryptographicHash>
+
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
+
+    struct personInfo
+    {
+        QByteArray id = 0;
+        QByteArray id_father = 0;
+        QString    name;
+        QString    patronymic;
+        QString    nameFather;
+        QString    born;
+        QString    die;
+        QString    info;
+
+    };
+    QVector<personInfo> m_familly;
+    QVector<QVector<personInfo>> m_familly_list;
+
 
 public:
     QAction *action;
@@ -51,6 +69,10 @@ private slots:
     void on_Clicked(QTreeWidgetItem * item, int column);
     void acceptPerson(QString str);
 
+    //Сохраняю все данные из дерева
+    void on_savePersonStack(void);
+    void savePersonStack(personInfo& person_father, QTreeWidgetItem* parent = 0);
+
 
 private:
     int  treeCount(QTreeWidget *, QTreeWidgetItem *); //подсчёт количества элементов в QTreeWidget
@@ -61,5 +83,7 @@ private:
     int              m_count;         //переменная для хранения номера очередного узла
     QTreeWidgetItem* m_currentItem;   //текущий элемент, запоминается при клике в QTreeWidget
     int              m_currentColumn; //номер столбца, на самом деле будет = 0, т.к. у нас 1 столбец
+
+
 };
 #endif // MAINWINDOW_H
